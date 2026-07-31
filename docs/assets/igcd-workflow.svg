@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="260" viewBox="0 0 1100 260" role="img" aria-labelledby="title desc">
+  <title id="title">IGCD workflow</title>
+  <desc id="desc">Configuration, environment, inventory, Sentinel exports, mask exports, sync, change maps, quality control, packaging, and viewers.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .box { fill: #ffffff; stroke: #1f2937; stroke-width: 1.5; rx: 10; }
+      .stage { font: 600 15px Arial, sans-serif; fill: #111827; }
+      .detail { font: 400 12px Arial, sans-serif; fill: #4b5563; }
+      .arrow { stroke: #2563eb; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+      .note { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.2; rx: 8; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M 0 0 L 10 4 L 0 8 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1100" height="260"/>
+  <rect class="box" x="25" y="40" width="120" height="72"/>
+  <text class="stage" x="85" y="68" text-anchor="middle">Config</text>
+  <text class="detail" x="85" y="91" text-anchor="middle">config.json</text>
+  <path class="arrow" d="M 145 76 H 181"/>
+  <rect class="box" x="185" y="40" width="120" height="72"/>
+  <text class="stage" x="245" y="68" text-anchor="middle">Inventory</text>
+  <text class="detail" x="245" y="91" text-anchor="middle">GLIMS</text>
+  <path class="arrow" d="M 305 76 H 341"/>
+  <rect class="box" x="345" y="40" width="120" height="72"/>
+  <text class="stage" x="405" y="68" text-anchor="middle">Sentinel</text>
+  <text class="detail" x="405" y="91" text-anchor="middle">t1 then t2</text>
+  <path class="arrow" d="M 465 76 H 501"/>
+  <rect class="box" x="505" y="40" width="120" height="72"/>
+  <text class="stage" x="565" y="68" text-anchor="middle">Masks</text>
+  <text class="detail" x="565" y="91" text-anchor="middle">t1 then t2</text>
+  <path class="arrow" d="M 625 76 H 661"/>
+  <rect class="box" x="665" y="40" width="120" height="72"/>
+  <text class="stage" x="725" y="68" text-anchor="middle">Sync</text>
+  <text class="detail" x="725" y="91" text-anchor="middle">Drive files</text>
+  <path class="arrow" d="M 785 76 H 821"/>
+  <rect class="box" x="825" y="40" width="120" height="72"/>
+  <text class="stage" x="885" y="68" text-anchor="middle">Change</text>
+  <text class="detail" x="885" y="91" text-anchor="middle">4 classes</text>
+  <path class="arrow" d="M 945 76 H 981"/>
+  <rect class="box" x="985" y="40" width="90" height="72"/>
+  <text class="stage" x="1030" y="68" text-anchor="middle">Dataset</text>
+  <text class="detail" x="1030" y="91" text-anchor="middle">splits</text>
+  <rect class="note" x="190" y="155" width="720" height="58"/>
+  <text class="stage" x="550" y="179" text-anchor="middle">Earth Engine exports are asynchronous</text>
+  <text class="detail" x="550" y="200" text-anchor="middle">Submit Sentinel tasks, wait in Earth Engine, submit mask tasks, wait, then sync and generate change maps locally.</text>
+</svg>
