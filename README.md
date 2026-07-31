@@ -1,61 +1,47 @@
-# Indian Glacier Change Dataset Pipeline
+# Indian Glacier Change Dataset (IGCD)
 
-IGCD is a research-grade Python package and Colab workflow for generating a glacier change detection dataset from GLIMS glacier inventory polygons, Sentinel-2 Level-2A Surface Reflectance imagery, and Copernicus GLO-30 DEM data through Google Earth Engine.
+IGCD is a Python and Google Colab pipeline for building a glacier change
+detection dataset from public satellite and geospatial data. It uses
+[GLIMS Glacier Inventory](https://www.glims.org/),
+[Sentinel-2 Level-2A Surface Reflectance](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED),
+[Copernicus GLO-30 DEM](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_DEM_GLO30),
+[Google Earth Engine](https://earthengine.google.com/), and
+[Google Drive](https://www.google.com/drive/).
 
-The notebooks are thin orchestration layers. Core logic lives in `igcd/` so the workflow is testable, reusable, and suitable for processing large glacier inventories.
+The repository is designed for MSc/PhD research, publication-quality dataset
+generation, and deep learning experiments on glacier change detection.
 
-## Outputs
+![IGCD workflow](docs/assets/igcd-workflow.svg)
 
-- Cloud-masked Sentinel-2 seasonal composites.
-- Cleaned GLIMS-based glacier inventory with stable `IGCD_000001` identifiers.
-- Year-specific glacier masks aligned to Sentinel imagery.
-- Four-class glacier change masks:
-  - `0` background
-  - `1` stable glacier
-  - `2` glacier retreat
-  - `3` glacier advance
-- Quality reports and processing manifests.
-- Glacier-grouped train/validation/test splits.
-- Dataset metadata and label definitions.
+## What This Project Generates
 
-## Workflow
+- Clean glacier inventory with stable IDs such as `IGCD_000001`.
+- Cloud-masked Sentinel-2 composites for two observation years.
+- Year-specific glacier masks.
+- Four-class glacier change maps.
+- PNG previews for visual inspection.
+- Quality-control reports.
+- Train/validation/test splits.
+- Dataset metadata for machine learning workflows.
 
-```mermaid
-flowchart TD
-  A["Configuration"] --> B["Environment Initialization"]
-  B --> C["GLIMS Inventory Preparation"]
-  C --> D["Sentinel-2 Acquisition"]
-  D --> E["Glacier Delineation"]
-  E --> F["Change Mask Generation"]
-  F --> G["Quality Control"]
-  G --> H["Dataset Packaging"]
-```
+![Change classes](docs/assets/change-classes.svg)
 
-## Installation
+Change-mask labels:
 
-In Google Colab, run the notebooks in order from `notebooks/`. For local development:
+| Value | Class | Meaning |
+|---:|---|---|
+| `0` | Background | Non-glacier pixel |
+| `1` | Stable Glacier | Glacier in both `t1` and `t2` |
+| `2` | Glacier Retreat | Glacier in `t1`, not glacier in `t2` |
+| `3` | Glacier Advance | Not glacier in `t1`, glacier in `t2` |
 
-```bash
-python -m pip install -r requirements.txt
-python -m pip install -e .
-pytest
-```
-
-Earth Engine access requires a Google Cloud project with Earth Engine enabled. Update `config/config.json` before running acquisition jobs:
-
-```json
-{
-  "earth_engine": {
-    "project": "Your-Google-Cloud-Project-ID"
-  }
-}
-```
-
-## Repository Layout
+## Repository Structure
 
 ```text
 config/
   config.json
+docs/
+  assets/
 igcd/
   config.py
   ee_utils.py
@@ -68,13 +54,14 @@ igcd/
   change_detection.py
   quality_control.py
   packaging.py
+  raster_viewer.py
   visualization.py
   io.py
   utils.py
 notebooks/
-  Change_Map_Set_Viewer.ipynb
-  Satellite_GeoTIFF_Viewer.ipynb
   IGCD_End_to_End_Pipeline.ipynb
+  Satellite_GeoTIFF_Viewer.ipynb
+  Change_Map_Set_Viewer.ipynb
   00_Project_Setup.ipynb
   01_Environment.ipynb
   02_Glacier_Inventory.ipynb
@@ -84,71 +71,357 @@ notebooks/
   06_Quality_Control.ipynb
   07_Dataset_Packaging.ipynb
 tests/
+requirements.txt
+pyproject.toml
 ```
 
-## Configuration
+## Main Notebooks
 
-All operational settings are stored in `config/config.json`. Important sections:
+| Notebook | Purpose |
+|---|---|
+| [`IGCD_End_to_End_Pipeline.ipynb`](notebooks/IGCD_End_to_End_Pipeline.ipynb) | Main all-in-one workflow |
+| [`Satellite_GeoTIFF_Viewer.ipynb`](notebooks/Satellite_GeoTIFF_Viewer.ipynb) | Upload/open any `.tif` and inspect bands, RGB composites, overlays, and histograms |
+| [`Change_Map_Set_Viewer.ipynb`](notebooks/Change_Map_Set_Viewer.ipynb) | View `t1`, `t2`, change map, and change overlay as one sample set |
+| [`00_Project_Setup.ipynb`](notebooks/00_Project_Setup.ipynb) to [`07_Dataset_Packaging.ipynb`](notebooks/07_Dataset_Packaging.ipynb) | Modular workflow for debugging each stage separately |
 
-- `temporal`: observation years and seasonal windows.
-- `inventory`: GLIMS download batch size and optional feature cap.
-- `sentinel`: Sentinel-2 collection, bands, cloud thresholds, ROI buffering, and composite reducer.
-- `dem`: Copernicus DEM source and elevation limits.
-- `delineation`: adaptive threshold options and fallback spectral/terrain thresholds.
-- `morphology`: opening, closing, hole filling, and component filtering.
-- `quality_control`: resolution, cloud, alignment, and area-change tolerances.
-- `export.sentinel_dtype`: exported Sentinel stack dtype. Keep `float32` to avoid Earth Engine mixed-band export errors.
-- `export.max_tasks_per_run`: maximum Earth Engine export tasks submitted in one run. Default is `3000`.
-- `export.check_existing_queue`: optional Earth Engine queue pre-check. Default is `false`; set `true` only when you want the exporter to account for already queued tasks.
-- `processing.max_glaciers_per_export_batch`: number of glaciers used for one export batch. Default is `1500`, which gives `1500` baseline-year Sentinel exports plus `1500` target-year Sentinel exports.
-- `splits`: glacier-level train/validation/test ratios.
-- `paths`: local and Drive-backed project paths.
+## Installation
 
-## Usage
+### Google Colab
 
-Satellite image viewer:
+Open the repository folder in Google Drive and run:
 
-Open `notebooks/Satellite_GeoTIFF_Viewer.ipynb` to upload or select any
-GeoTIFF and inspect it interactively. It supports RGB and false-color
-composites, single-band previews, threshold overlays, histograms, metadata, and
-PNG preview export.
+```python
+%pip install -q -r requirements.txt
+```
 
-Change-map set viewer:
+The notebooks also include an `INSTALL_DEPENDENCIES` flag that installs the
+required packages inside Colab.
 
-Open `notebooks/Change_Map_Set_Viewer.ipynb` after `RUN_CHANGE_MASKS=True` has
-created change rasters. It shows each sample as baseline image, target image,
-4-class change map, and optional change overlay.
+### Local Development
 
-IGCD dataset generation:
+```bash
+python -m pip install -r requirements.txt
+python -m pip install -e .
+pytest
+```
 
-Single-notebook workflow:
+## Required Google Setup
 
-1. Open `notebooks/IGCD_End_to_End_Pipeline.ipynb` in Colab.
-2. Edit `config/config.json`, especially `earth_engine.project`, `study_area`, and `temporal`.
-3. Run setup, environment, inventory, Sentinel export, and mask export stages.
-4. Wait for Earth Engine Drive export tasks to finish.
-5. Rerun the notebook with `RUN_SYNC_EXPORTS`, `RUN_CHANGE_MASKS`, `RUN_QC`, and `RUN_PACKAGING` enabled.
+Before running Earth Engine exports:
 
-Modular workflow:
+1. Create or select a Google Cloud project.
+2. Enable Google Earth Engine for that project.
+3. Authenticate Earth Engine in Colab.
+4. Make sure Google Drive has enough storage for exported GeoTIFF files.
+5. Update [`config/config.json`](config/config.json).
 
-1. Run `00_Project_Setup.ipynb` to create project folders and default config.
-2. Edit `config/config.json`, especially `earth_engine.project`, `study_area`, and `temporal`.
-3. Run `01_Environment.ipynb` to install dependencies and authenticate Earth Engine.
-4. Run notebooks `02` through `07` sequentially.
+Important config fields:
 
-Long-running Earth Engine exports are resumable. The Sentinel acquisition notebook writes an acquisition manifest and skips files that already exist when `export.skip_existing` is true.
+```json
+{
+  "earth_engine": {
+    "project": "your-google-cloud-project-id",
+    "glims_asset": "projects/your-project/assets/glims_polygons",
+    "sentinel_collection": "COPERNICUS/S2_SR_HARMONIZED",
+    "dem_collection": "COPERNICUS/DEM/GLO30_2024_1"
+  },
+  "temporal": {
+    "baseline_year": 2018,
+    "target_year": 2023,
+    "years": [2018, 2023]
+  },
+  "export": {
+    "drive_folder": "IGCD_exports",
+    "max_tasks_per_run": 3000,
+    "check_existing_queue": false
+  },
+  "processing": {
+    "max_glaciers_per_export_batch": 1500
+  }
+}
+```
 
-For Earth Engine task limits, do not submit Sentinel and mask exports in the
-same run. Submit Sentinel exports for both configured years first, wait for
-those tasks to finish, then submit mask exports for both years, then generate
-change masks locally after downloaded exports are organized.
+## Exact Run Order
 
-If old tasks are already queued, either clear them first or set
-`export.check_existing_queue` to `true` so the exporter accounts for occupied
-queue slots.
+Earth Engine exports are asynchronous. After a cell submits export tasks, the
+work continues on Earth Engine servers even if Colab disconnects.
 
-## Development Notes
+Use the all-in-one notebook:
 
-- Keep model-specific preprocessing, tiling, normalization, and augmentation outside this dataset generation pipeline.
-- Use server-side Earth Engine operations for image filtering, compositing, and export wherever possible.
-- Unit tests cover local numerical logic; Earth Engine integration should be verified in Colab with authenticated credentials.
+[`notebooks/IGCD_End_to_End_Pipeline.ipynb`](notebooks/IGCD_End_to_End_Pipeline.ipynb)
+
+![Notebook flags](docs/assets/notebook-flags.svg)
+
+### Run 1: Prepare Inventory and Submit Sentinel Exports
+
+Use this when starting a new batch.
+
+```python
+RUN_SETUP = True
+RUN_ENVIRONMENT = True
+RUN_INVENTORY = True
+
+RUN_SENTINEL_EXPORTS = True
+RUN_MASK_EXPORTS = False
+
+RUN_SYNC_EXPORTS = False
+RUN_CHANGE_MASKS = False
+RUN_QC = False
+RUN_PACKAGING = False
+
+MAX_GLACIERS_FOR_RUN = 1500
+MAX_EXPORT_TASKS_PER_RUN = 3000
+```
+
+This submits:
+
+```text
+1500 Sentinel exports for t1
+1500 Sentinel exports for t2
+```
+
+After submission, wait until Earth Engine tasks finish and files appear in:
+
+```text
+MyDrive/IGCD_exports/
+```
+
+### Run 2: Submit Glacier Mask Exports
+
+Use this only after Sentinel export tasks are complete.
+
+```python
+RUN_SETUP = False
+RUN_ENVIRONMENT = True
+RUN_INVENTORY = False
+
+RUN_SENTINEL_EXPORTS = False
+RUN_MASK_EXPORTS = True
+
+RUN_SYNC_EXPORTS = False
+RUN_CHANGE_MASKS = False
+RUN_QC = False
+RUN_PACKAGING = False
+
+MAX_GLACIERS_FOR_RUN = 1500
+MAX_EXPORT_TASKS_PER_RUN = 3000
+```
+
+This submits:
+
+```text
+1500 glacier mask exports for t1
+1500 glacier mask exports for t2
+```
+
+After submission, wait until Earth Engine tasks finish and mask files appear in:
+
+```text
+MyDrive/IGCD_exports/
+```
+
+### Run 3: Sync Files, Generate Change Maps, QC, and Package Dataset
+
+Use this only after all Sentinel and mask exports are complete.
+
+```python
+RUN_SETUP = False
+RUN_ENVIRONMENT = False
+RUN_INVENTORY = False
+
+RUN_SENTINEL_EXPORTS = False
+RUN_MASK_EXPORTS = False
+
+RUN_SYNC_EXPORTS = True
+RUN_CHANGE_MASKS = True
+RUN_QC = True
+RUN_PACKAGING = True
+```
+
+This does not submit new Earth Engine tasks. It only processes exported files
+already saved in Google Drive.
+
+## Output Folders
+
+Earth Engine writes exports to:
+
+```text
+MyDrive/IGCD_exports/
+```
+
+The sync stage organizes those files into the project:
+
+```text
+exports/<year>/
+data/processed/masks/<year>/
+data/processed/change_masks/
+reports/change_previews/
+reports/change_set_previews/
+reports/quality_report.csv
+reports/quality_summary.json
+dataset/images/
+dataset/labels/
+dataset/metadata/
+```
+
+Runtime images generated by notebooks:
+
+| Image | Generated by | Path |
+|---|---|---|
+| Inventory overview | Inventory stage | `reports/inventory_overview.png` |
+| Change-map preview | Change-mask stage | `reports/change_previews/<glacier_id>_change.png` |
+| Change set preview | Change viewer notebook | `reports/change_set_previews/<glacier_id>_2018_2023_change_set.png` |
+| Satellite viewer preview | Satellite viewer notebook | `reports/satellite_viewer_previews/<name>_preview.png` |
+
+Example Markdown to add real generated images after you create them:
+
+```markdown
+![Inventory overview](reports/inventory_overview.png)
+![Change preview](reports/change_previews/IGCD_000001_change.png)
+![Change set](reports/change_set_previews/IGCD_000001_2018_2023_change_set.png)
+```
+
+## Visual Inspection Tools
+
+### Satellite GeoTIFF Viewer
+
+Open [`Satellite_GeoTIFF_Viewer.ipynb`](notebooks/Satellite_GeoTIFF_Viewer.ipynb)
+to upload or select any satellite `.tif`.
+
+It supports:
+
+- RGB and false-color composites.
+- Single-band preview with colormaps.
+- Band statistics.
+- Histograms.
+- Threshold overlays.
+- PNG preview export.
+
+### Change Map Set Viewer
+
+Open [`Change_Map_Set_Viewer.ipynb`](notebooks/Change_Map_Set_Viewer.ipynb)
+after `RUN_CHANGE_MASKS=True`.
+
+It shows:
+
+- Baseline image `t1`.
+- Target image `t2`.
+- Corresponding change map.
+- Optional change overlay on `t1` or `t2`.
+- Pixel counts for each change class.
+
+## Dataset Packaging
+
+The packaging stage creates:
+
+```text
+dataset/
+  images/
+  labels/
+  metadata/
+    splits.csv
+    manifest.csv
+    dataset_info.json
+    label_definition.json
+```
+
+Splits are assigned by glacier ID:
+
+```text
+70% train
+10% validation
+20% test
+```
+
+The same glacier never appears in more than one split.
+
+## Configuration Reference
+
+All parameters are controlled by [`config/config.json`](config/config.json).
+
+| Section | Meaning |
+|---|---|
+| `earth_engine` | Google project and Earth Engine dataset IDs |
+| `study_area` | Bounding box and region metadata |
+| `temporal` | Baseline year, target year, and seasonal window |
+| `inventory` | GLIMS batch download settings |
+| `sentinel` | Bands, cloud masking, image collection, ROI buffer |
+| `dem` | DEM source and elevation limits |
+| `delineation` | NDSI/NDWI, slope, elevation, and threshold settings |
+| `morphology` | Opening, closing, hole filling, object filtering |
+| `export` | Drive folder, CRS, scale, task limits, dtype |
+| `processing` | Number of glaciers per export batch |
+| `quality_control` | Alignment, resolution, cloud, and area-change checks |
+| `splits` | Train/validation/test ratios |
+| `paths` | Local project folders |
+
+## Common Problems
+
+### Colab Session Terminates
+
+This is usually fine. Once Earth Engine export tasks are submitted, they run on
+Earth Engine servers. Reopen Colab later and continue with the next stage.
+
+### Too Many Earth Engine Tasks
+
+If the Earth Engine queue is not empty, clear old tasks first or set:
+
+```json
+"check_existing_queue": true
+```
+
+inside `export`.
+
+For normal use after clearing the queue, keep:
+
+```json
+"check_existing_queue": false
+```
+
+### Exported Files Are Outside the Project Folder
+
+This is normal. Earth Engine saves to:
+
+```text
+MyDrive/IGCD_exports/
+```
+
+Run:
+
+```python
+RUN_SYNC_EXPORTS = True
+```
+
+to organize exports into the project directory.
+
+### Deprecated DEM Warning
+
+The project uses:
+
+```text
+COPERNICUS/DEM/GLO30_2024_1
+```
+
+If you still see a warning for `COPERNICUS/DEM/GLO30`, update your Colab copy of
+`config/config.json`.
+
+## Testing
+
+Local unit tests cover numerical functions and packaging helpers:
+
+```bash
+pytest
+```
+
+Earth Engine integration must be verified in Colab with authenticated Google
+credentials.
+
+## Notes for Research Use
+
+- Keep raw exported Sentinel imagery unchanged.
+- Do not mix model-specific tiling, normalization, or augmentation into this
+  dataset generation pipeline.
+- Use the viewer notebooks to manually inspect sample quality before training
+  deep learning models.
+- Review `quality_report.csv` before publishing or using the packaged dataset.
+
