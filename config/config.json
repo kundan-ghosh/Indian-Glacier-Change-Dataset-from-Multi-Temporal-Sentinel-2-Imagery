@@ -1,0 +1,138 @@
+{
+  "dataset": {
+    "description": "Reproducible glacier change dataset generated from GLIMS, Sentinel-2 L2A, and Copernicus GLO-30 DEM.",
+    "license": "CC-BY-4.0",
+    "name": "Indian Glacier Change Dataset",
+    "short_name": "IGCD",
+    "version": "0.1.0"
+  },
+  "delineation": {
+    "adaptive_threshold": true,
+    "fallback_ndsi_threshold": 0.42,
+    "fallback_ndwi_max": 0.35,
+    "max_slope_deg": 55,
+    "min_slope_deg": 2,
+    "ndsi_band": "NDSI",
+    "ndwi_band": "NDWI",
+    "otsu_min_samples": 128,
+    "prior_buffer_m": 250
+  },
+  "dem": {
+    "elevation_band": "DEM",
+    "max_glacier_elevation_m": 7500,
+    "min_glacier_elevation_m": 2500,
+    "source": "COPERNICUS/DEM/GLO30_2024_1"
+  },
+  "earth_engine": {
+    "cloud_probability_collection": "COPERNICUS/S2_CLOUD_PROBABILITY",
+    "dem_collection": "COPERNICUS/DEM/GLO30_2024_1",
+    "glims_asset": "Your-Google-Earth-Engine-Asset",
+    "project": "Your-Google-Cloud-Project-ID",
+    "sentinel_collection": "COPERNICUS/S2_SR_HARMONIZED"
+  },
+  "export": {
+    "check_existing_queue": false,
+    "crs": "EPSG:32643",
+    "drive_folder": "IGCD_exports",
+    "file_format": "GeoTIFF",
+    "manifest_flush_interval": 25,
+    "max_queued_tasks": 3000,
+    "max_tasks_per_run": 3000,
+    "max_pixels": 1000000000,
+    "scale_m": 10,
+    "skip_existing": true,
+    "sentinel_dtype": "float32"
+  },
+  "inventory": {
+    "download_batch_size": 1000,
+    "max_features": null
+  },
+  "morphology": {
+    "closing_radius": 2,
+    "fill_holes": true,
+    "min_component_area_pixels": 16,
+    "min_object_size_pixels": 9,
+    "opening_radius": 1
+  },
+  "paths": {
+    "dataset": "dataset",
+    "exports": "exports",
+    "interim": "data/interim",
+    "logs": "logs",
+    "processed": "data/processed",
+    "raw": "data/raw",
+    "reports": "reports"
+  },
+  "processing": {
+    "max_glaciers_per_export_batch": 1500
+  },
+  "quality_control": {
+    "expected_resolution_m": 10,
+    "max_area_change_fraction": 0.6,
+    "max_cloud_fraction": 0.15,
+    "min_mask_pixels": 10
+  },
+  "sentinel": {
+    "bands": [
+      "B2",
+      "B3",
+      "B4",
+      "B8",
+      "B11",
+      "B12",
+      "SCL"
+    ],
+    "cloud_cover_property": "CLOUDY_PIXEL_PERCENTAGE",
+    "cloud_probability_threshold": 45,
+    "composite_reducer": "median",
+    "invalid_scl_values": [
+      0,
+      1,
+      3,
+      8,
+      9,
+      10,
+      11
+    ],
+    "max_cloud_percent": 35,
+    "max_images_per_composite": 80,
+    "reflectance_bands": [
+      "B2",
+      "B3",
+      "B4",
+      "B8",
+      "B11",
+      "B12"
+    ],
+    "roi_buffer_m": 1000
+  },
+  "splits": {
+    "test": 0.2,
+    "train": 0.7,
+    "validation": 0.1
+  },
+  "study_area": {
+    "bbox": [
+      72.0,
+      26.0,
+      98.0,
+      38.0
+    ],
+    "country_names": [
+      "India"
+    ],
+    "name": "Indian Himalayan Region"
+  },
+  "temporal": {
+    "baseline_year": 2018,
+    "end_day": 15,
+    "end_month": 10,
+    "start_day": 1,
+    "start_month": 7,
+    "target_year": 2023,
+    "years": [
+      2018,
+      2023
+    ]
+  }
+}

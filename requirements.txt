@@ -1,0 +1,16 @@
+earthengine-api
+geemap
+geopandas
+numpy
+pandas
+opencv-python
+scikit-image
+scipy
+rasterio
+shapely
+matplotlib
+tqdm
+pyproj
+fiona
+ipywidgets
+pytest
