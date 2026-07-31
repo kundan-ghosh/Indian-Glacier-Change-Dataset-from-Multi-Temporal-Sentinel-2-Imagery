@@ -425,3 +425,20 @@ credentials.
   deep learning models.
 - Review `quality_report.csv` before publishing or using the packaged dataset.
 
+
+# © Copyright Notice
+
+**© 2026 Kundan Ghosh. All Rights Reserved.**
+
+The **Indian Glacier Change Dataset (IGCD)** and its associated generation pipeline are developed for research and educational purposes. You may use this dataset for academic and non-commercial research, provided that proper attribution is given. If you redistribute or modify the dataset or pipeline, you must clearly indicate the changes made and retain this copyright notice.
+
+
+## Acknowledgment
+
+Please include the following acknowledgment in your work:
+
+> *This work uses the Indian Glacier Change Dataset (IGCD), developed by Kundan Ghosh using Google Earth Engine and Sentinel-2 imagery.*
+
+## License
+
+This project is intended for research and educational use. For commercial use, redistribution, or licensing inquiries, please contact the author.
