@@ -1,0 +1,2 @@
+# Indian-Glacier-Change-Dataset-from-Multi-Temporal-Sentinel-2-Imagery
+IGCD (Indian Glacier Change Dataset) is a high-resolution, multi-temporal benchmark dataset for glacier change detection across the Indian Himalayas. Built using Google Earth Engine and Sentinel-2 imagery, it provides cloud-free satellite images, glacier masks, and pixel-level change labels for AI, remote sensing, and climate research.
