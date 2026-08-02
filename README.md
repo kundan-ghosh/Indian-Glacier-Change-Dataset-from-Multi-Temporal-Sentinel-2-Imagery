@@ -26,6 +26,46 @@ generation, and deep learning experiments on glacier change detection.
 
 ![Change classes](docs/assets/change-classes.svg)
 
+## Band Reference
+
+### Sentinel Composite GeoTIFF Bands
+
+Each exported Sentinel composite GeoTIFF contains **9 bands**:
+
+| GeoTIFF band number | Band name | Description |
+|---:|---|---|
+| `1` | `B2` | Blue |
+| `2` | `B3` | Green |
+| `3` | `B4` | Red |
+| `4` | `B8` | Near infrared, NIR |
+| `5` | `B11` | Short-wave infrared 1, SWIR 1 |
+| `6` | `B12` | Short-wave infrared 2, SWIR 2 |
+| `7` | `SCL` | Sentinel-2 Scene Classification Layer |
+| `8` | `NDSI` | Snow/glacier index: `(B3 - B11) / (B3 + B11)` |
+| `9` | `NDWI` | Water index: `(B3 - B8) / (B3 + B8)` |
+
+Useful visualization combinations:
+
+| Purpose | Red | Green | Blue |
+|---|---:|---:|---:|
+| Natural color | `3` | `2` | `1` |
+| False color NIR | `4` | `3` | `2` |
+| Glacier/snow inspection | `5` | `4` | `2` |
+| NDSI inspection | view band `8` as a single band |  |  |
+
+### Glacier Mask GeoTIFF Bands
+
+Each yearly glacier mask GeoTIFF contains **1 band**:
+
+| Value | Meaning |
+|---:|---|
+| `0` | Non-glacier |
+| `1` | Glacier |
+
+### Change Map GeoTIFF Bands
+
+Each change map GeoTIFF contains **1 band** with four classes:
+
 Change-mask labels:
 
 | Value | Class | Meaning |
@@ -404,6 +444,7 @@ COPERNICUS/DEM/GLO30_2024_1
 
 If you still see a warning for `COPERNICUS/DEM/GLO30`, update your Colab copy of
 `config/config.json`.
+
 
 ## Testing
 
